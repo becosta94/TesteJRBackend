@@ -1,28 +1,43 @@
 ﻿using apiToDo.DTO;
+using apiToDo.Exceptions;
+using apiToDo.Interfaces;
 using apiToDo.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
-namespace apiToDo.Controllers
+namespace apiToDo.Controllers.V1
 {
     [ApiController]
     [Route("[controller]")]
     public class TarefasController : ControllerBase
     {
-        [Authorize]
+        private ITaskGetter _taskGetter;
+
+        public TarefasController(ITaskGetter taskGetter)
+        {
+            _taskGetter = taskGetter;
+        }
+
+        //[Authorize]
         [HttpPost("lstTarefas")]
         public ActionResult lstTarefas()
         {
             try
             {
-              
-                return StatusCode(200);
+                List<TarefaDTO> tarefaDTOs = _taskGetter.Get();
+                if (tarefaDTOs == null)
+                    throw new TaskListEmptyException("A lista de tarefas está vazia!");
+                return StatusCode(200, tarefaDTOs);
             }
-
+            catch (TaskListEmptyException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
             catch (Exception ex)
             {
-                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}"});
+                return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
             }
         }
 

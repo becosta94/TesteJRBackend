@@ -31,7 +31,7 @@ namespace apiToDo.Models
                     DS_TAREFA = "Subir Projeto de Teste no GitHub"
                 });
 
-                return new List<TarefaDTO>();
+                return lstTarefas;
             }
             catch(Exception ex)
             {
