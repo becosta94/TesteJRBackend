@@ -13,11 +13,15 @@ namespace apiToDo.Controllers.V1
     [Route("[controller]")]
     public class TarefasController : ControllerBase
     {
-        private ITaskGetter _taskGetter;
+        private ITaskCreator _taskCreator;
+        private ITaskAdder _taskAdder;
+        private ITaskDeleter _taskDeleter;
 
-        public TarefasController(ITaskGetter taskGetter)
+        public TarefasController(ITaskCreator taskCreator, ITaskAdder taskAdder, ITaskDeleter taskDeleter)
         {
-            _taskGetter = taskGetter;
+            _taskCreator = taskCreator;
+            _taskAdder = taskAdder;
+            _taskDeleter = taskDeleter;
         }
 
         //[Authorize]
@@ -26,10 +30,10 @@ namespace apiToDo.Controllers.V1
         {
             try
             {
-                List<TarefaDTO> tarefaDTOs = _taskGetter.Get();
-                if (tarefaDTOs == null)
-                    throw new TaskListEmptyException("A lista de tarefas está vazia!");
-                return StatusCode(200, tarefaDTOs);
+                List<TarefaDTO> tasks = _taskCreator.Create();
+                if (tasks == null)
+                    throw new TaskListEmptyException("A lista de tarefas está vazia.");
+                return StatusCode(200, tasks);
             }
             catch (TaskListEmptyException ex)
             {
@@ -42,16 +46,30 @@ namespace apiToDo.Controllers.V1
         }
 
         [HttpPost("InserirTarefas")]
-        public ActionResult InserirTarefas([FromBody] TarefaDTO Request)
+        public ActionResult InserirTarefas([FromBody] TarefaDTO request)
         {
             try
             {
-
-                return StatusCode(200);
-
-
+                if (request == null || request.ID_TAREFA == 0 || string.IsNullOrEmpty(request.DS_TAREFA))
+                    throw new TaskToAddNullException("A tarefa ou um de seus atributos não pode estar vazia.");
+                List<TarefaDTO> tasks = _taskCreator.Create();
+                _taskAdder.Add(tasks, request);
+                if (tasks == null)
+                    throw new TaskListEmptyException("A lista de tarefas está vazia.");
+                return StatusCode(200, tasks);
             }
-
+            catch (TaskListEmptyException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }            
+            catch (TaskToAddNullException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }            
+            catch (ExistingIdException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });
@@ -63,10 +81,23 @@ namespace apiToDo.Controllers.V1
         {
             try
             {
-
-                return StatusCode(200);
+                //Criação das tarefas
+                List<TarefaDTO> tasks = _taskCreator.Create();
+                //Implementação da classe de deletar tarefas
+                _taskDeleter.Delete(tasks, ID_TAREFA);
+                //Tratamento caso a lista esteja vazia
+                if (tasks == null)
+                    throw new TaskListEmptyException("A lista de tarefas está vazia.");
+                return StatusCode(200, tasks);
             }
-
+            catch (TaskListEmptyException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }            
+            catch (IdNotFoundException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(400, new { msg = $"Ocorreu um erro em sua API {ex.Message}" });

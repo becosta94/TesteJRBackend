@@ -1,5 +1,4 @@
 using apiToDo.Interfaces;
-using apiToDo.Repositories;
 using apiToDo.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,8 +34,9 @@ namespace apiToDo
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "apiToDo", Version = "v1" });
             });
-            services.AddScoped<ITaskGetter, TasksRepository>();
             services.AddScoped<ITaskCreator, TaskCreator>();
+            services.AddScoped<ITaskAdder, TaskAdder>();
+            services.AddScoped<ITaskDeleter, TaskDeleter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +53,7 @@ namespace apiToDo
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

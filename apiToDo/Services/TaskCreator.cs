@@ -7,10 +7,19 @@ namespace apiToDo.Services
 {
     public class TaskCreator : ITaskCreator
     {
+        private Tarefas _tarefas;
+
+        public TaskCreator()
+        {
+            _tarefas = new Tarefas();
+        }
+
         public List<TarefaDTO> Create()
         {
-            Tarefas task = new Tarefas();
-            return task.lstTarefas();
+            List<TarefaDTO> tasks = _tarefas.lstTarefas();
+            if (tasks == null || tasks.Count == 0)
+                return null;
+            return tasks;
         }
     }
 }

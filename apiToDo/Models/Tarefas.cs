@@ -38,8 +38,7 @@ namespace apiToDo.Models
                 throw ex;
             }
         }
-
-
+        //Não usado para respeitar princípio do SOLID de responsobilidades únicas
         public void InserirTarefa(TarefaDTO Request)
         {
             try
@@ -52,6 +51,7 @@ namespace apiToDo.Models
                 throw ex;
             }
         }
+        //Não usado para respeitar princípio do SOLID de responsobilidades únicas
         public void DeletarTarefa(int ID_TAREFA)
         {
             try
