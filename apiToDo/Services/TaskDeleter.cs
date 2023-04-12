@@ -12,7 +12,7 @@ namespace apiToDo.Services
         {
             //Verificação se o ID digitado não é nulo e se ele existe dentro da lista atual
             if (idToDelete == 0 || listToDelete.Where(e => e.ID_TAREFA == idToDelete).Count() == 0)
-                throw new IdNotFoundException("ID não encontrado.");
+                throw new IdNotFoundException($"Tarefa com ID = {idToDelete} não encontrada.");
             //Remoção da tarefa que tem o mesmo ID do input
             listToDelete.RemoveAll(e => e.ID_TAREFA == idToDelete);
             //Verificação se a lista está vazia ou é nula

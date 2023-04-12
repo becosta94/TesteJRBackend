@@ -37,6 +37,8 @@ namespace apiToDo
             services.AddScoped<ITaskCreator, TaskCreator>();
             services.AddScoped<ITaskAdder, TaskAdder>();
             services.AddScoped<ITaskDeleter, TaskDeleter>();
+            services.AddScoped<ITaskUpdater, TaskUpdater>();
+            services.AddScoped<ITaskGetterById, TaskGetterById>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
